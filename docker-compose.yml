@@ -3,9 +3,9 @@ version: "3.8"
 services:
   db:
     image: postgres:latest
-    container_name: postgress
+    container_name: postgres
     ports:
-      - "5432:6432"
+      - "5432:5432"  # Fixed: External:Internal port
     environment:
       - POSTGRES_DB=tickets
       - POSTGRES_USER=root
@@ -13,12 +13,27 @@ services:
     networks:
       - fullstack
     volumes:
-      - data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
 
+  app:
+    build: .
+    container_name: ticket
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=db  # Use service name as host
+      - DB_PORT=5432
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=tickets
+      - ENVIRONMENT=docker
+    depends_on:
+      - db
+    networks:
+      - fullstack
 
 volumes:
-  data:
-
+  postgres_data:
 
 networks:
   fullstack:
