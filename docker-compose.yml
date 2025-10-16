@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:latest
+    container_name: postgress
+    ports:
+      - "5432:6432"
+    environment:
+      - POSTGRES_DB=tickets
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+    networks:
+      - fullstack
+    volumes:
+      - data:/var/lib/postgresql/data
+
+
+volumes:
+  data:
+
+
+networks:
+  fullstack:
+    driver: bridge
