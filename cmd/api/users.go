@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"ticket/internal/store"
+	"ticket/internal/utils"
 
 	log2 "github.com/rs/zerolog/log"
 )
@@ -37,13 +38,8 @@ func (app *Application) Create(w http.ResponseWriter, r *http.Request) {
 	res, err := app.Store.User.Create(ctx, user)
 	if err != nil {
 		log2.Err(err).Msg("error creating user")
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to create user"})
+		utils.InternalError(w, err)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(res); err != nil {
-		log2.Err(err).Msg("error encoding response")
-	}
+	utils.Created(w, res)
 }
