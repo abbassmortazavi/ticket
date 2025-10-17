@@ -78,6 +78,11 @@ docker-build:
 	@echo "Building Docker image..."
 	docker compose build
 
+.PHONY: docker-up-log
+docker-up-log:
+	@echo "Docker Up..."
+	docker compose up
+
 .PHONY: docker-logs
 docker-logs:
 	docker compose logs -f app

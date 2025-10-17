@@ -2,29 +2,28 @@ package api
 
 import (
 	"errors"
-	"log"
 	"net/http"
 	"ticket/internal/store"
 	"ticket/internal/utils"
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/rs/zerolog"
+	log2 "github.com/rs/zerolog/log"
 )
 
 type Application struct {
 	Config utils.Config
 	Store  store.Storage
-	Logger zerolog.Logger
 }
 
 func (app *Application) Start() http.Handler {
 	r := chi.NewRouter()
 
 	r.Route("/v1", func(r chi.Router) {
-		r.Route("/posts", func(r chi.Router) {
+		r.Route("/users", func(r chi.Router) {
+			r.Post("/", app.Create)
 			r.Route("/{id}", func(r chi.Router) {
-				r.Get("/", app.GetUser)
+				//r.Get("/", app.Create)
 			})
 		})
 	})
@@ -32,9 +31,10 @@ func (app *Application) Start() http.Handler {
 }
 func (app *Application) Run(mux http.Handler) error {
 
-	log.Println("starting server")
+	log2.Info().Msg("starting server")
 
-	adr := app.Config.AppPort
+	//adr := app.Config.AppPort
+	adr := ":8081"
 	srv := &http.Server{
 		Addr:         adr,
 		Handler:      mux,
@@ -42,10 +42,10 @@ func (app *Application) Run(mux http.Handler) error {
 		ReadTimeout:  10 * time.Second,
 		IdleTimeout:  time.Minute,
 	}
-	app.Logger.Info().Msg("starting server")
+	log2.Info().Msg("starting server")
 	// This will block until the server stops
 	if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		app.Logger.Error().Err(err).Msg("server failed to start")
+		log2.Error().Err(err).Msg("server failed to start")
 		return err
 	}
 	return nil

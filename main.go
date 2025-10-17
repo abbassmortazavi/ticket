@@ -13,22 +13,18 @@ import (
 )
 
 func main() {
-	//utils.InitLogger()
-	logger := zerolog.New(nil)
 	config, err := utils.LoadConfig(".")
 	if err != nil {
 		log.Fatal().Err(err).Msg("config load failed")
 	}
 
+	// Initialize global logger
+	initGlobalLogger(config.Debug == "true")
+
 	if config.Debug == "true" {
 		log.Info().Msg("debug mode enabled")
 	}
-	/*dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
-	config.Username,
-	config.Password,
-	config.Host,
-	config.Port,
-	config.Name)*/
+
 	if host := os.Getenv("DB_HOST"); host != "" {
 		config.Host = host
 		log.Info().Msg("db host set to: " + config.Host)
@@ -48,14 +44,32 @@ func main() {
 		log.Fatal().Err(err).Msg("connect db failed")
 	}
 	log.Info().Msg("connect db success")
+
 	storage := store.NewStorage(database)
 	app := &api.Application{
 		Config: config,
 		Store:  storage,
-		Logger: logger,
 	}
+
+	log.Info().Msg("start application")
 	mux := app.Start()
 	if err := app.Run(mux); err != nil {
-		logger.Fatal().Err(err).Msg("server failed to start")
+		log.Fatal().Err(err).Msg("server failed to start")
+	}
+}
+
+func initGlobalLogger(debug bool) {
+	// Console output for development
+	output := zerolog.ConsoleWriter{
+		Out:        os.Stdout,
+		TimeFormat: "2006-01-02 15:04:05",
+	}
+
+	log.Logger = zerolog.New(output).With().Timestamp().Logger()
+
+	if debug {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	} else {
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
 }

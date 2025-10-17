@@ -1,9 +1,11 @@
-CREATE TABLE IF NOT EXISTS users
+CREATE TABLE users
 (
-    id bigserial PRIMARY KEY,
-    email varchar(255) UNIQUE NOT NULL,
-    username varchar(255) UNIQUE NOT NULL,
-    password bytea NOT NULL,
-    created_at timestamp(0) with time zone not null DEFAULT NOW(),
-    updated_at timestamp(0) with time zone not null DEFAULT NOW()
-    );
+    id         SERIAL PRIMARY KEY,
+    username   VARCHAR(50) UNIQUE  NOT NULL,
+    email      VARCHAR(100) UNIQUE NOT NULL,
+    password   VARCHAR(255)        NOT NULL,
+    full_name  VARCHAR(100) null,
+    mobile     VARCHAR(20),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
