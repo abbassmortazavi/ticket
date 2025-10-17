@@ -49,8 +49,8 @@ func Created(w http.ResponseWriter, data any) {
 	Success(w, http.StatusCreated, &envelop{Data: data}, "Created successfully")
 }
 
-func BadRequest(w http.ResponseWriter, err error) {
-	Error(w, http.StatusBadRequest, "Bad request", err)
+func BadRequest(w http.ResponseWriter, message string, err error) {
+	Error(w, http.StatusBadRequest, message, err)
 }
 
 func InternalError(w http.ResponseWriter, err error) {
@@ -69,4 +69,12 @@ func Unauthorized(w http.ResponseWriter, err error) {
 }
 func Forbidden(w http.ResponseWriter) {
 	Error(w, http.StatusForbidden, "Forbidden", nil)
+}
+
+func ReadJson(w http.ResponseWriter, r *http.Request, data any) error {
+	maxBytes := 1_048_576
+	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+	return decoder.Decode(data)
 }

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
 	"ticket/internal/store"
 	"ticket/internal/utils"
@@ -19,11 +18,10 @@ type CreateUserRequest struct {
 
 func (app *Application) Create(w http.ResponseWriter, r *http.Request) {
 	var req CreateUserRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
+	err := utils.ReadJson(w, r, &req)
 	if err != nil {
 		log2.Err(err).Msg("error decoding body")
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid JSON"})
+		utils.BadRequest(w, "error decoding body", err)
 		return
 	}
 
@@ -37,7 +35,6 @@ func (app *Application) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	res, err := app.Store.User.Create(ctx, user)
 	if err != nil {
-		log2.Err(err).Msg("error creating user")
 		utils.InternalError(w, err)
 		return
 	}
