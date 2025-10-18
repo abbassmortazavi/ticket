@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -12,9 +13,10 @@ type successResponse struct {
 }
 
 type errorResponse struct {
-	Success int    `json:"success"`
-	Message string `json:"message"`
-	Error   string `json:"error"`
+	Success int            `json:"success"`
+	Message string         `json:"message"`
+	Error   string         `json:"error,omitempty"`
+	Errors  []ValidatorErr `json:"errors,omitempty"`
 }
 
 func Success(w http.ResponseWriter, status int, data interface{}, message string) {
@@ -26,7 +28,7 @@ func Success(w http.ResponseWriter, status int, data interface{}, message string
 		Data:    data,
 	})
 }
-func Error(w http.ResponseWriter, status int, message string, err error) {
+func Error(w http.ResponseWriter, status int, message string, err interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 
@@ -34,9 +36,19 @@ func Error(w http.ResponseWriter, status int, message string, err error) {
 		Success: status,
 		Message: message,
 	}
-
-	if err != nil {
-		response.Error = err.Error()
+	// Handle different types of errors
+	switch v := err.(type) {
+	case error:
+		response.Error = v.Error()
+	case []ValidatorErr:
+		response.Errors = v
+	case string:
+		response.Error = v
+	case nil:
+		// No error data
+	default:
+		// Handle other types if needed
+		response.Error = fmt.Sprintf("%v", v)
 	}
 
 	json.NewEncoder(w).Encode(response)
@@ -51,6 +63,11 @@ func Created(w http.ResponseWriter, data any) {
 
 func BadRequest(w http.ResponseWriter, message string, err error) {
 	Error(w, http.StatusBadRequest, message, err)
+}
+func ValidationError(w http.ResponseWriter, message string, validationErrors []ValidatorErr) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusBadRequest)
+	Error(w, http.StatusBadRequest, message, validationErrors)
 }
 
 func InternalError(w http.ResponseWriter, err error) {

@@ -9,11 +9,11 @@ import (
 )
 
 type CreateUserRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
-	FullName string `json:"full_name"`
-	Mobile   string `json:"mobile"`
+	Username string `json:"username" validate:"required,min=3,max=32,alphanum"`
+	Password string `json:"password" validate:"required,min=6"`
+	Email    string `json:"email" validate:"required,email"`
+	FullName string `json:"full_name" validate:"max=255"`
+	Mobile   string `json:"mobile" validate:"required"`
 }
 
 func (app *Application) Create(w http.ResponseWriter, r *http.Request) {
@@ -25,6 +25,9 @@ func (app *Application) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !utils.ValidateStruct(w, &req) {
+		return
+	}
 	ctx := r.Context()
 	user := store.User{
 		Username: req.Username,
