@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 
@@ -17,14 +18,15 @@ type ValidatorErr struct {
 func ValidateStruct(w http.ResponseWriter, v interface{}) bool {
 	err := validate.Struct(v)
 	if err != nil {
-		validationErrors := err.(validator.ValidationErrors)
-		errors := make([]ValidatorErr, 0)
+		var validationErrors validator.ValidationErrors
+		errors.As(err, &validationErrors)
+		errs := make([]ValidatorErr, 0)
 		for _, fieldError := range validationErrors {
 			field := strings.ToLower(fieldError.Field())
 			message := getValidationMessage(field, fieldError.Tag(), fieldError.Param())
-			errors = append(errors, ValidatorErr{field, message})
+			errs = append(errs, ValidatorErr{field, message})
 		}
-		ValidationError(w, "Validation failed!!", errors)
+		ValidationError(w, "Validation failed!!", errs)
 		return false
 	}
 	return true

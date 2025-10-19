@@ -65,8 +65,6 @@ func BadRequest(w http.ResponseWriter, message string, err error) {
 	Error(w, http.StatusBadRequest, message, err)
 }
 func ValidationError(w http.ResponseWriter, message string, validationErrors []ValidatorErr) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusBadRequest)
 	Error(w, http.StatusBadRequest, message, validationErrors)
 }
 

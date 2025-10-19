@@ -23,16 +23,13 @@ func (app *Application) Start() http.Handler {
 		r.Route("/users", func(r chi.Router) {
 			r.Post("/", app.Create)
 			r.Route("/{id}", func(r chi.Router) {
-				//r.Get("/", app.Create)
+				r.Get("/", app.GetUser)
 			})
 		})
 	})
 	return r
 }
 func (app *Application) Run(mux http.Handler) error {
-
-	log2.Info().Msg("starting server")
-
 	//adr := app.Config.AppPort
 	adr := ":8081"
 	srv := &http.Server{

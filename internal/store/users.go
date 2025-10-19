@@ -10,6 +10,7 @@ type UserStore struct {
 }
 
 type User struct {
+	ID        int    `json:"id"`
 	Username  string `json:"username"`
 	Password  string `json:"password"`
 	Email     string `json:"email"`
@@ -28,4 +29,23 @@ func (s *UserStore) Create(ctx context.Context, user User) (int, error) {
 	}
 
 	return id, nil
+}
+func (s *UserStore) GetUser(ctx context.Context, id int) (User, error) {
+	var user User
+	query := `select * from users where id = $1`
+	err := s.db.QueryRowContext(ctx, query, id).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.Password,
+		&user.FullName,
+		&user.Mobile,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+	if err != nil {
+		return User{}, err
+	}
+	return user, nil
+
 }

@@ -8,6 +8,7 @@ import (
 type Storage struct {
 	User interface {
 		Create(ctx context.Context, user User) (int, error)
+		GetUser(ctx context.Context, id int) (User, error)
 	}
 }
 

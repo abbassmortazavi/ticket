@@ -37,8 +37,6 @@ func main() {
 		config.Password,
 		config.Name)
 
-	log.Debug().Msg("dsn: " + dsn)
-
 	database, err := db.New(dsn, config.MaxIdleTimeout, config.MaxConn, config.MaxIdle)
 	if err != nil {
 		log.Fatal().Err(err).Msg("connect db failed")
@@ -51,7 +49,6 @@ func main() {
 		Store:  storage,
 	}
 
-	log.Info().Msg("start application")
 	mux := app.Start()
 	if err := app.Run(mux); err != nil {
 		log.Fatal().Err(err).Msg("server failed to start")
