@@ -69,3 +69,21 @@ func (app *Application) GetUser(w http.ResponseWriter, r *http.Request) {
 	utils.Success(w, http.StatusOK, res, "Fetch User Successfully")
 
 }
+func (app *Application) Delete(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	ctx := r.Context()
+	userID, err := strconv.Atoi(id)
+	if err != nil {
+		log2.Err(err).Msg("error decoding id")
+		utils.BadRequest(w, "error decoding id", err)
+		return
+	}
+	err = app.Store.User.Delete(ctx, userID)
+	if err != nil {
+		utils.InternalError(w, err)
+		return
+	}
+
+	utils.Success(w, http.StatusOK, nil, "User Delete Successfully!!")
+
+}

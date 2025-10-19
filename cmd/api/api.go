@@ -24,6 +24,7 @@ func (app *Application) Start() http.Handler {
 			r.Post("/", app.Create)
 			r.Route("/{id}", func(r chi.Router) {
 				r.Get("/", app.GetUser)
+				r.Delete("/", app.Delete)
 			})
 		})
 	})

@@ -49,3 +49,11 @@ func (s *UserStore) GetUser(ctx context.Context, id int) (User, error) {
 	return user, nil
 
 }
+func (s *UserStore) Delete(ctx context.Context, id int) error {
+	query := `delete from users where id = $1`
+	_, err := s.db.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
