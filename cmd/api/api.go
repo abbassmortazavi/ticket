@@ -25,6 +25,7 @@ func (app *Application) Start() http.Handler {
 			r.Route("/{id}", func(r chi.Router) {
 				r.Get("/", app.GetUser)
 				r.Delete("/", app.Delete)
+				r.Patch("/", app.Update)
 			})
 		})
 	})

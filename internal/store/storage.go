@@ -10,6 +10,7 @@ type Storage struct {
 		Create(ctx context.Context, user User) (int, error)
 		GetUser(ctx context.Context, id int) (User, error)
 		Delete(ctx context.Context, id int) error
+		Update(ctx context.Context, user User) (int, error)
 	}
 }
 
