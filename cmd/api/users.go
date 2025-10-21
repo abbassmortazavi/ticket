@@ -88,12 +88,12 @@ func (app *Application) Delete(w http.ResponseWriter, r *http.Request) {
 }
 
 type UpdateRequest struct {
-	ID       int    `json:"id" validate:"required,gte=1"`
-	Username string `json:"username" validate:"required,min=3,max=32,alphanum"`
-	Password string `json:"password" validate:"required,min=6"`
-	Email    string `json:"email" validate:"required,email"`
-	FullName string `json:"full_name" validate:"max=255"`
-	Mobile   string `json:"mobile" validate:"required"`
+	ID       int    `json:"_"`
+	Username string `json:"username" validate:"omitempty,min=3,max=32,alphanum"`
+	Password string `json:"password" validate:"omitempty,min=6"`
+	Email    string `json:"email" validate:"omitempty,email"`
+	FullName string `json:"full_name" validate:"omitempty,max=255"`
+	Mobile   string `json:"mobile" validate:"omitempty"`
 }
 
 func (app *Application) Update(w http.ResponseWriter, r *http.Request) {
@@ -104,6 +104,11 @@ func (app *Application) Update(w http.ResponseWriter, r *http.Request) {
 		utils.BadRequest(w, "error decoding body", err)
 		return
 	}
+
+	if !utils.ValidateStruct(w, &req) {
+		return
+	}
+
 	id := chi.URLParam(r, "id")
 	ctx := r.Context()
 	userID, err := strconv.Atoi(id)
@@ -114,22 +119,26 @@ func (app *Application) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	user, err := app.Store.User.GetUser(ctx, userID)
 	if err != nil {
-		utils.InternalError(w, err)
+		utils.InternalError(w, err, "User Not Found!!")
 		return
 	}
-	if !utils.ValidateStruct(w, &req) {
-		return
+	if req.Username != "" {
+		user.Username = req.Username
 	}
-	req.Password = user.Password
-	req.Email = user.Email
-	req.Username = user.Username
-	req.FullName = user.FullName
-	req.Mobile = user.Mobile
+	if req.Email != "" {
+		user.Email = req.Email
+	}
+	if req.FullName != "" {
+		user.FullName = req.FullName
+	}
+	if req.Mobile != "" {
+		user.Mobile = req.Mobile
+	}
 	res, err := app.Store.User.Update(ctx, user)
+	log2.Err(err).Msg("error updating user")
 	if err != nil {
 		utils.InternalError(w, err)
 		return
 	}
-	utils.Created(w, res)
-
+	utils.Success(w, http.StatusOK, res, "User Update Successfully")
 }

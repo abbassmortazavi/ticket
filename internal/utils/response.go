@@ -68,8 +68,12 @@ func ValidationError(w http.ResponseWriter, message string, validationErrors []V
 	Error(w, http.StatusBadRequest, message, validationErrors)
 }
 
-func InternalError(w http.ResponseWriter, err error) {
-	Error(w, http.StatusInternalServerError, "Internal server error", err)
+func InternalError(w http.ResponseWriter, err error, message ...string) {
+	msg := "Internal server error"
+	if len(message) > 0 && message[0] != "" {
+		msg = message[0]
+	}
+	Error(w, http.StatusInternalServerError, msg, err)
 }
 
 func NotFound(w http.ResponseWriter) {

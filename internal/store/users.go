@@ -58,8 +58,8 @@ func (s *UserStore) Delete(ctx context.Context, id int) error {
 	return nil
 }
 func (s *UserStore) Update(ctx context.Context, user User) (int, error) {
-	query := `update users set username= $1, password=$2, full_name=$3, mobile=$4 where id=$5;`
-	err := s.db.QueryRowContext(ctx, query, user.Username, user.Password, user.FullName, user.Mobile).Scan(&user.ID)
+	query := `update users set username= $1, email=$2, password=$3, full_name=$4, mobile=$5 where id=$6 returning id, username`
+	err := s.db.QueryRowContext(ctx, query, user.Username, user.Email, user.Password, user.FullName, user.Mobile, user.ID).Scan(&user.ID)
 	if err != nil {
 		return 0, err
 	}

@@ -46,6 +46,8 @@ func getValidationMessage(field string, fieldTag string, param string) string {
 		return field + " must be a valid full name"
 	case "mobile":
 		return field + " must be a valid mobile"
+	case "alphanum":
+		return field + " must be a valid username"
 	default:
 		return "default value is required"
 
