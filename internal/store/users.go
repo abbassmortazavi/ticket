@@ -3,24 +3,14 @@ package store
 import (
 	"context"
 	"database/sql"
+	"ticket/internal/models"
 )
 
 type UserStore struct {
 	db *sql.DB
 }
 
-type User struct {
-	ID        int    `json:"id"`
-	Username  string `json:"username"`
-	Password  string `json:"password"`
-	Email     string `json:"email"`
-	FullName  string `json:"full_name"`
-	Mobile    string `json:"mobile,omitempty"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"Updated_at"`
-}
-
-func (s *UserStore) Create(ctx context.Context, user User) (int, error) {
+func (s *UserStore) Create(ctx context.Context, user models.User) (int, error) {
 	query := `insert into users (username, email, password, full_name, mobile) values ($1,$2, $3, $4,$5) returning id`
 	var id int
 	err := s.db.QueryRowContext(ctx, query, user.Username, user.Email, user.Password, user.FullName, user.Mobile).Scan(&id)
@@ -30,8 +20,8 @@ func (s *UserStore) Create(ctx context.Context, user User) (int, error) {
 
 	return id, nil
 }
-func (s *UserStore) GetUser(ctx context.Context, id int) (User, error) {
-	var user User
+func (s *UserStore) GetUser(ctx context.Context, id int) (models.User, error) {
+	var user models.User
 	query := `select * from users where id = $1`
 	err := s.db.QueryRowContext(ctx, query, id).Scan(
 		&user.ID,
@@ -44,7 +34,7 @@ func (s *UserStore) GetUser(ctx context.Context, id int) (User, error) {
 		&user.UpdatedAt,
 	)
 	if err != nil {
-		return User{}, err
+		return models.User{}, err
 	}
 	return user, nil
 
@@ -57,7 +47,7 @@ func (s *UserStore) Delete(ctx context.Context, id int) error {
 	}
 	return nil
 }
-func (s *UserStore) Update(ctx context.Context, user User) (int, error) {
+func (s *UserStore) Update(ctx context.Context, user models.User) (int, error) {
 	query := `update users set username= $1, email=$2, password=$3, full_name=$4, mobile=$5 where id=$6 returning id, username`
 	err := s.db.QueryRowContext(ctx, query, user.Username, user.Email, user.Password, user.FullName, user.Mobile, user.ID).Scan(&user.ID)
 	if err != nil {

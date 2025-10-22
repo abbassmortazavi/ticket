@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 	"strconv"
-	"ticket/internal/store"
+	"ticket/internal/models"
 	"ticket/internal/utils"
 
 	"github.com/go-chi/chi/v5"
@@ -31,7 +31,7 @@ func (app *Application) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ctx := r.Context()
-	user := store.User{
+	user := models.User{
 		Username: req.Username,
 		Password: req.Password,
 		Email:    req.Email,
@@ -58,7 +58,8 @@ func (app *Application) GetUser(w http.ResponseWriter, r *http.Request) {
 		utils.InternalError(w, err)
 		return
 	}
-	res := store.User{
+
+	res := models.User{
 		ID:       user.ID,
 		Username: user.Username,
 		Password: user.Password,
