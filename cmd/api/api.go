@@ -36,6 +36,9 @@ func (app *Application) Start() http.Handler {
 					r.Patch("/", app.Update)
 				})
 			})
+			r.Route("/buses", func(r chi.Router) {
+
+			})
 		})
 
 	})
