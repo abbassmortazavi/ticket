@@ -10,7 +10,7 @@ import (
 type User struct {
 	ID        int       `json:"id"`
 	Username  string    `json:"username"`
-	Password  string    `json:"_"`
+	Password  string    `json:"password,omitempty"`
 	Email     string    `json:"email"`
 	FullName  string    `json:"full_name"`
 	Mobile    string    `json:"mobile,omitempty"`

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"ticket/cmd/api"
+	"ticket/internal/auth"
 	"ticket/internal/db"
 	"ticket/internal/store"
 	"ticket/internal/utils"
@@ -41,12 +42,15 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("connect db failed")
 	}
-	log.Info().Msg("connect db success")
 
 	storage := store.NewStorage(database)
+	jwt := config.JwtSecret
+	authenticator := auth.NewJwtAuthenticator(jwt)
+
 	app := &api.Application{
-		Config: config,
-		Store:  storage,
+		Config:        config,
+		Store:         storage,
+		Authenticator: authenticator,
 	}
 
 	mux := app.Start()

@@ -55,3 +55,22 @@ func (s *UserStore) Update(ctx context.Context, user models.User) (int, error) {
 	}
 	return user.ID, nil
 }
+
+func (s *UserStore) GetUserByUsername(ctx context.Context, username string) (models.User, error) {
+	var user models.User
+	query := `select * from users where username = $1`
+	err := s.db.QueryRowContext(ctx, query, username).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.Password,
+		&user.FullName,
+		&user.Mobile,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+	if err != nil {
+		return models.User{}, err
+	}
+	return user, nil
+}

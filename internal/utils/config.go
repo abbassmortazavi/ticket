@@ -1,6 +1,8 @@
 package utils
 
-import "github.com/spf13/viper"
+import (
+	"github.com/spf13/viper"
+)
 
 type Config struct {
 	Host           string `mapstructure:"DB_HOST"`
@@ -13,6 +15,7 @@ type Config struct {
 	MaxConn        int    `mapstructure:"DB_MAX_CONN"`
 	MaxIdleTimeout string `mapstructure:"DB_MAX_IDLE_TIMEOUT"`
 	AppPort        string `mapstructure:"APP_PORT"`
+	JwtSecret      string `mapstructure:"JWT_SECRET"`
 }
 
 func LoadConfig(path string) (config Config, err error) {
