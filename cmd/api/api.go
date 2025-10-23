@@ -3,31 +3,41 @@ package api
 import (
 	"errors"
 	"net/http"
+	"ticket/internal/auth"
 	"ticket/internal/store"
 	"ticket/internal/utils"
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	log2 "github.com/rs/zerolog/log"
 )
 
 type Application struct {
-	Config utils.Config
-	Store  store.Storage
+	Config        utils.Config
+	Store         store.Storage
+	Authenticator auth.Authenticator
 }
 
 func (app *Application) Start() http.Handler {
 	r := chi.NewRouter()
-
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
 	r.Route("/v1", func(r chi.Router) {
-		r.Route("/users", func(r chi.Router) {
-			r.Post("/", app.Create)
-			r.Route("/{id}", func(r chi.Router) {
-				r.Get("/", app.GetUser)
-				r.Delete("/", app.Delete)
-				r.Patch("/", app.Update)
+		r.Post("/", app.Create)
+		r.Post("/register", app.Register)
+		r.Post("/login", app.Login)
+		r.Route("/api", func(r chi.Router) {
+			r.Use(app.AuthMiddleware)
+			r.Route("/users", func(r chi.Router) {
+				r.Route("/{id}", func(r chi.Router) {
+					r.Get("/", app.GetUser)
+					r.Delete("/", app.Delete)
+					r.Patch("/", app.Update)
+				})
 			})
 		})
+
 	})
 	return r
 }
