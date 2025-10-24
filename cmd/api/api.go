@@ -37,7 +37,7 @@ func (app *Application) Start() http.Handler {
 				})
 			})
 			r.Route("/buses", func(r chi.Router) {
-
+				r.Post("/", app.CreateBus)
 			})
 		})
 

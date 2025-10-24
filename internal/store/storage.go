@@ -22,5 +22,6 @@ type Storage struct {
 func NewStorage(db *sql.DB) Storage {
 	return Storage{
 		User: &UserStore{db},
+		Bus:  &BusStore{db},
 	}
 }
