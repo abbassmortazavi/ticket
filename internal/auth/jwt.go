@@ -25,7 +25,7 @@ type JWT struct {
 
 func (j *JWT) GenerateToken(userID int, username string) (string, error) {
 	//expirationTime := time.Now().Add(24 * time.Hour)
-	expirationTime := time.Now().Add(2 * time.Minute) // Shorter lifetime
+	expirationTime := time.Now().Add(20 * time.Minute) // Shorter lifetime
 
 	claims := Claims{
 		UserID:   userID,

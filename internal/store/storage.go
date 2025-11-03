@@ -14,10 +14,14 @@ type Storage struct {
 		Delete(ctx context.Context, id int) error
 		Update(ctx context.Context, user models.User) (int, error)
 	}
+	Bus interface {
+		Create(ctx context.Context, bus models.Bus) (models.Bus, error)
+	}
 }
 
 func NewStorage(db *sql.DB) Storage {
 	return Storage{
 		User: &UserStore{db},
+		Bus:  &BusStore{db},
 	}
 }
