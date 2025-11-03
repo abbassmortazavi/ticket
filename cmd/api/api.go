@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"ticket/internal/auth"
 	"ticket/internal/store"
-	"ticket/internal/utils"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -14,7 +13,6 @@ import (
 )
 
 type Application struct {
-	Config        utils.Config
 	Store         store.Storage
 	Authenticator auth.Authenticator
 }

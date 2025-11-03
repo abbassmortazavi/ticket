@@ -7,48 +7,48 @@ import (
 	"ticket/internal/auth"
 	"ticket/internal/db"
 	"ticket/internal/store"
-	"ticket/internal/utils"
+	"ticket/pkg/config"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
 )
 
 func main() {
-	config, err := utils.LoadConfig(".")
-	if err != nil {
-		log.Fatal().Err(err).Msg("config load failed")
-	}
-
+	config.Set()
 	// Initialize global logger
-	initGlobalLogger(config.Debug == "true")
+	initGlobalLogger(viper.GetString("APP_DEBUG") == "true")
 
-	if config.Debug == "true" {
+	if viper.GetString("APP_DEBUG") == "true" {
 		log.Info().Msg("debug mode enabled")
 	}
 
+	var myHost string
 	if host := os.Getenv("DB_HOST"); host != "" {
-		config.Host = host
-		log.Info().Msg("db host set to: " + config.Host)
+		myHost = host
+	} else {
+		myHost = viper.GetString("DB_HOST")
 	}
 
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		config.Host,
-		config.Port,
-		config.Username,
-		config.Password,
-		config.Name)
+		myHost,
+		viper.GetString("DB_PORT"),
+		viper.GetString("DB_USERNAME"),
+		viper.GetString("DB_PASSWORD"),
+		viper.GetString("DB_NAME"))
 
-	database, err := db.New(dsn, config.MaxIdleTimeout, config.MaxConn, config.MaxIdle)
+	log.Info().Msgf("dsn: %s", dsn)
+
+	database, err := db.New(dsn, viper.GetString("DB_MAX_IDLE_TIMEOUT"), viper.GetInt("DB_MAX_CONN"), viper.GetInt("DB_MAX_IDLE"))
 	if err != nil {
 		log.Fatal().Err(err).Msg("connect db failed")
 	}
 
 	storage := store.NewStorage(database)
-	jwt := config.JwtSecret
+	jwt := viper.GetString("JwtSecret")
 	authenticator := auth.NewJwtAuthenticator(jwt)
 
 	app := &api.Application{
-		Config:        config,
 		Store:         storage,
 		Authenticator: authenticator,
 	}

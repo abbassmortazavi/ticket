@@ -1,6 +1,6 @@
 MIGRATION_PATH = ./cmd/migrations
 BINARY_NAME = main
-include app.env
+include .env
 
 ## Database Migrations
 
