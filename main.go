@@ -1,21 +1,18 @@
 package main
 
 import (
+	"ticket/cmd"
 	"ticket/cmd/api"
 	"ticket/internal/auth"
 	"ticket/internal/store"
-	"ticket/pkg/config"
 	"ticket/pkg/database"
-	"ticket/pkg/logger"
 
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
 
 func main() {
-	config.Set()
-	database.Connect()
-	logger.Init()
+	cmd.Execute()
 
 	storage := store.NewStorage(database.DB)
 	jwt := viper.GetString("JwtSecret")
