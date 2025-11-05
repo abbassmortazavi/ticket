@@ -7,6 +7,8 @@ import (
 	"os"
 	"time"
 
+	_ "github.com/lib/pq" // This is the PostgreSQL driver import
+
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
@@ -18,12 +20,14 @@ func Connect() {
 	} else {
 		myHost = viper.GetString("DB_HOST")
 	}
+
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		myHost,
 		viper.GetString("DB_PORT"),
 		viper.GetString("DB_USERNAME"),
 		viper.GetString("DB_PASSWORD"),
 		viper.GetString("DB_NAME"))
+
 	db, err := sql.Open("postgres", dsn)
 
 	if err != nil {
