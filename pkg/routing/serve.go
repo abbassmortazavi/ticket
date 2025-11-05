@@ -17,7 +17,7 @@ func Run() {
 		Addr:    configs.Host + ":" + configs.AppPort,
 		Handler: router,
 	}
-
+	log.Info().Msgf("listening on %s", configs.Host+":"+configs.AppPort)
 	err := server.ListenAndServe()
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to start server")
