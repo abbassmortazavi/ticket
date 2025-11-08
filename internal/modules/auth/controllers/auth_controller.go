@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"ticket/internal/modules/auth/requests"
 	"ticket/internal/modules/auth/services"
 	"ticket/internal/modules/user/models"
 	userService "ticket/internal/modules/user/services"
@@ -23,17 +24,13 @@ func New() *Controller {
 	}
 }
 
-type LoginRequest struct {
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
-}
 type AuthResponse struct {
 	Token string      `json:"token"`
 	User  models.User `json:"user"`
 }
 
 func (controller *Controller) Login(w http.ResponseWriter, r *http.Request) {
-	var req LoginRequest
+	var req requests.LoginRequest
 	err := utils.ReadJson(w, r, &req)
 	if err != nil {
 		log2.Err(err).Msg("error decoding body")

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"ticket/internal/modules/user/models"
+	"ticket/internal/modules/user/requests"
 	userService "ticket/internal/modules/user/services"
 	"ticket/internal/utils"
 
@@ -90,16 +91,6 @@ func (c *UserController) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 	utils.Success(w, http.StatusOK, nil, "User Deleted Successfully")
 }
-
-type UpdateRequest struct {
-	ID       int    `json:"_"`
-	Username string `json:"username" validate:"omitempty,min=3,max=32,alphanum"`
-	Password string `json:"password" validate:"omitempty,min=6"`
-	Email    string `json:"email" validate:"omitempty,email"`
-	FullName string `json:"full_name" validate:"omitempty,max=255"`
-	Mobile   string `json:"mobile" validate:"omitempty"`
-}
-
 func (c *UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	userID, err := strconv.Atoi(id)
@@ -108,7 +99,7 @@ func (c *UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		utils.BadRequest(w, "error decoding id", err)
 		return
 	}
-	var req UpdateRequest
+	var req requests.UpdateRequest
 	err = utils.ReadJson(w, r, &req)
 	if err != nil {
 		log2.Err(err).Msg("error decoding body")
