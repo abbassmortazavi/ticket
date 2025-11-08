@@ -14,7 +14,7 @@ import (
 
 type Application struct {
 	Store         store.Storage
-	Authenticator auth.Authenticator
+	Authenticator auth.JWT
 }
 
 func (app *Application) Start() http.Handler {

@@ -1,9 +1,8 @@
 package routes
 
 import (
-	authCtrl "ticket/internal/modules/auth/controllers"
-
 	"github.com/go-chi/chi/v5"
+	authCtrl "ticket/internal/modules/auth/controllers"
 )
 
 func Routes(router chi.Router) {

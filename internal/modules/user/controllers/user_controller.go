@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 	"ticket/internal/modules/user/models"
 	userService "ticket/internal/modules/user/services"
 	"ticket/internal/utils"
 
+	"github.com/go-chi/chi/v5"
 	log2 "github.com/rs/zerolog/log"
 )
 
@@ -42,4 +44,28 @@ func (c *UserController) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	utils.Created(w, res)
+}
+func (c *UserController) GetUser(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	userID, err := strconv.Atoi(id)
+	if err != nil {
+		log2.Err(err).Msg("error decoding id")
+		utils.BadRequest(w, "error decoding id", err)
+		return
+	}
+	ctx := r.Context()
+	user, err := c.userService.GetById(ctx, userID)
+	if err != nil {
+		utils.InternalError(w, err)
+		return
+	}
+	res := models.User{
+		ID:       user.ID,
+		Username: user.Username,
+		Password: user.Password,
+		Email:    user.Email,
+		FullName: user.FullName,
+		Mobile:   user.Mobile,
+	}
+	utils.Success(w, http.StatusOK, res, "Fetch User Successfully")
 }

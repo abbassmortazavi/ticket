@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 	"ticket/internal/modules/auth/services"
 	"ticket/internal/modules/user/models"
@@ -34,7 +33,6 @@ type AuthResponse struct {
 }
 
 func (controller *Controller) Login(w http.ResponseWriter, r *http.Request) {
-	log.Println("here", auth.GetJwtAuthenticator())
 	var req LoginRequest
 	err := utils.ReadJson(w, r, &req)
 	if err != nil {
