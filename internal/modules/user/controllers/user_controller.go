@@ -69,3 +69,24 @@ func (c *UserController) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 	utils.Success(w, http.StatusOK, res, "Fetch User Successfully")
 }
+func (c *UserController) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	userID, err := strconv.Atoi(id)
+	if err != nil {
+		log2.Err(err).Msg("error decoding id")
+		utils.BadRequest(w, "error decoding id", err)
+		return
+	}
+	ctx := r.Context()
+	user, err := c.userService.GetById(ctx, userID)
+	if err != nil {
+		utils.InternalError(w, err)
+		return
+	}
+	err = c.userService.Delete(ctx, user.ID)
+	if err != nil {
+		utils.InternalError(w, err)
+		return
+	}
+	utils.Success(w, http.StatusOK, nil, "User Deleted Successfully")
+}

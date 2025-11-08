@@ -13,6 +13,8 @@ func Routes(router chi.Router) {
 	router.Route("/api/v1/users", func(r chi.Router) {
 		r.Use(authMiddleware.AuthMiddleware)
 		r.Get("/get-user/{id}", userController.GetUser)
+		r.Delete("/{id}", userController.DeleteUser)
+		r.Patch("/{id}", userController.Update)
 	})
 
 }

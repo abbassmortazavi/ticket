@@ -26,11 +26,8 @@ func (app *Application) Start() http.Handler {
 		r.Post("/register", app.Register)
 		r.Post("/login", app.Login)
 		r.Route("/api", func(r chi.Router) {
-			r.Use(app.AuthMiddleware)
 			r.Route("/users", func(r chi.Router) {
 				r.Route("/{id}", func(r chi.Router) {
-					r.Get("/", app.GetUser)
-					r.Delete("/", app.Delete)
 					r.Patch("/", app.Update)
 				})
 			})

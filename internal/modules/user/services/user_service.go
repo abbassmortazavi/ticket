@@ -24,3 +24,6 @@ func (u *UserService) GetById(ctx context.Context, id int) (models.User, error) 
 func (u *UserService) GetByUsername(ctx context.Context, username string) (models.User, error) {
 	return u.userRepository.GetByUsername(ctx, username)
 }
+func (u *UserService) Delete(ctx context.Context, id int) error {
+	return u.userRepository.Delete(ctx, id)
+}

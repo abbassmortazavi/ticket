@@ -62,3 +62,11 @@ func (u *UserRepository) GetByUsername(ctx context.Context, username string) (mo
 	}
 	return user, nil
 }
+func (u *UserRepository) Delete(ctx context.Context, id int) error {
+	query := `delete from users where id = $1`
+	_, err := u.DB.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
