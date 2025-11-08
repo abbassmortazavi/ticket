@@ -3,8 +3,8 @@ package api
 import (
 	"errors"
 	"net/http"
-	"ticket/internal/auth"
 	"ticket/internal/store"
+	"ticket/pkg/auth"
 	"time"
 
 	"github.com/go-chi/chi/v5"

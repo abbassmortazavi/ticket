@@ -18,3 +18,9 @@ func New() *UserService {
 func (u *UserService) CreateUser(ctx context.Context, user models.User) (int, error) {
 	return u.userRepository.Create(ctx, user)
 }
+func (u *UserService) GetById(ctx context.Context, id int) (models.User, error) {
+	return u.userRepository.GetById(ctx, id)
+}
+func (u *UserService) GetByUsername(ctx context.Context, username string) (models.User, error) {
+	return u.userRepository.GetByUsername(ctx, username)
+}

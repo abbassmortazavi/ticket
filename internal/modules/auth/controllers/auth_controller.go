@@ -1,12 +1,28 @@
-package api
+package controllers
 
 import (
+	"log"
 	"net/http"
-	models "ticket/internal/modules/user/models"
+	"ticket/internal/modules/auth/services"
+	"ticket/internal/modules/user/models"
+	userService "ticket/internal/modules/user/services"
 	"ticket/internal/utils"
+	"ticket/pkg/auth"
 
 	log2 "github.com/rs/zerolog/log"
 )
+
+type Controller struct {
+	authService services.AuthServiceInterface
+	userService userService.UserServiceInterface
+}
+
+func New() *Controller {
+	return &Controller{
+		authService: services.New(auth.GetJwtAuthenticator()),
+		userService: userService.New(),
+	}
+}
 
 type LoginRequest struct {
 	Username string `json:"username" validate:"required"`
@@ -17,7 +33,8 @@ type AuthResponse struct {
 	User  models.User `json:"user"`
 }
 
-func (app *Application) Login(w http.ResponseWriter, r *http.Request) {
+func (controller *Controller) Login(w http.ResponseWriter, r *http.Request) {
+	log.Println("here", auth.GetJwtAuthenticator())
 	var req LoginRequest
 	err := utils.ReadJson(w, r, &req)
 	if err != nil {
@@ -29,7 +46,7 @@ func (app *Application) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ctx := r.Context()
-	user, err := app.Store.User.GetUserByUsername(ctx, req.Username)
+	user, err := controller.userService.GetByUsername(ctx, req.Username)
 	if err != nil {
 		utils.InternalError(w, err)
 		return
@@ -39,7 +56,7 @@ func (app *Application) Login(w http.ResponseWriter, r *http.Request) {
 		utils.InternalError(w, nil, "password error")
 		return
 	}
-	token, err := app.Authenticator.GenerateToken(user.ID, user.Username)
+	token, err := controller.authService.GenerateToken(user.ID, user.Username)
 	if err != nil {
 		utils.InternalError(w, err)
 		return
@@ -50,7 +67,8 @@ func (app *Application) Login(w http.ResponseWriter, r *http.Request) {
 	}
 	utils.Success(w, http.StatusOK, res, "User Login")
 }
-func (app *Application) Register(w http.ResponseWriter, r *http.Request) {
+
+func (controller *Controller) Register(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	err := utils.ReadJson(w, r, &user)
 	if err != nil {
@@ -66,7 +84,8 @@ func (app *Application) Register(w http.ResponseWriter, r *http.Request) {
 		utils.InternalError(w, err)
 		return
 	}
-	res, err := app.Store.User.Create(ctx, user)
+
+	res, err := controller.userService.CreateUser(ctx, user)
 	if err != nil {
 		utils.InternalError(w, err)
 		return

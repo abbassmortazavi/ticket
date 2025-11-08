@@ -2,9 +2,11 @@ package repositories
 
 import (
 	"context"
-	models2 "ticket/internal/modules/user/models"
+	"ticket/internal/modules/user/models"
 )
 
 type UserRepositoryInterface interface {
-	Create(ctx context.Context, user models2.User) (int, error)
+	Create(ctx context.Context, user models.User) (int, error)
+	GetById(ctx context.Context, id int) (models.User, error)
+	GetByUsername(ctx context.Context, username string) (models.User, error)
 }
