@@ -27,3 +27,10 @@ func (u *UserService) GetByUsername(ctx context.Context, username string) (model
 func (u *UserService) Delete(ctx context.Context, id int) error {
 	return u.userRepository.Delete(ctx, id)
 }
+func (u *UserService) Update(ctx context.Context, user models.User) error {
+	_, err := u.userRepository.Update(ctx, user)
+	if err != nil {
+		return err
+	}
+	return nil
+}

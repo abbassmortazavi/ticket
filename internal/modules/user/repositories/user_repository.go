@@ -70,3 +70,11 @@ func (u *UserRepository) Delete(ctx context.Context, id int) error {
 	}
 	return nil
 }
+func (u *UserRepository) Update(ctx context.Context, user models.User) (int, error) {
+	query := `update users set username=$1,email=$2, password=$3, full_name=$4, mobile=$5 where id=$6 returning id, username`
+	err := u.DB.QueryRowContext(ctx, query, user.ID, user.Username, user.Email, user.Password, user.FullName, user.Mobile, user.ID).Scan(&user.ID)
+	if err != nil {
+		return 0, err
+	}
+	return user.ID, nil
+}

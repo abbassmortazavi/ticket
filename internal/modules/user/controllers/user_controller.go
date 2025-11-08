@@ -90,3 +90,51 @@ func (c *UserController) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 	utils.Success(w, http.StatusOK, nil, "User Deleted Successfully")
 }
+
+type UpdateRequest struct {
+	ID       int    `json:"_"`
+	Username string `json:"username" validate:"omitempty,min=3,max=32,alphanum"`
+	Password string `json:"password" validate:"omitempty,min=6"`
+	Email    string `json:"email" validate:"omitempty,email"`
+	FullName string `json:"full_name" validate:"omitempty,max=255"`
+	Mobile   string `json:"mobile" validate:"omitempty"`
+}
+
+func (c *UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	userID, err := strconv.Atoi(id)
+	if err != nil {
+		log2.Err(err).Msg("error decoding id")
+		utils.BadRequest(w, "error decoding id", err)
+		return
+	}
+	var req UpdateRequest
+	err = utils.ReadJson(w, r, &req)
+	if err != nil {
+		log2.Err(err).Msg("error decoding body")
+		utils.BadRequest(w, "error decoding body", err)
+		return
+	}
+	if !utils.ValidateStruct(w, &req) {
+		return
+	}
+	ctx := r.Context()
+	user, err := c.userService.GetById(ctx, userID)
+	if err != nil {
+		utils.InternalError(w, err)
+		return
+	}
+	if err := user.HashPassword(req.Password); err != nil {
+		utils.InternalError(w, err)
+		return
+	}
+	data := models.User{
+		Username: req.Username,
+		Password: req.Password,
+		Email:    req.Email,
+		FullName: req.FullName,
+		Mobile:   req.Mobile,
+	}
+	res := c.userService.Update(ctx, data)
+	utils.Success(w, http.StatusOK, res, "Update User Successfully")
+}

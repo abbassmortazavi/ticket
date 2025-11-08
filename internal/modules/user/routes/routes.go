@@ -14,7 +14,7 @@ func Routes(router chi.Router) {
 		r.Use(authMiddleware.AuthMiddleware)
 		r.Get("/get-user/{id}", userController.GetUser)
 		r.Delete("/{id}", userController.DeleteUser)
-		r.Patch("/{id}", userController.Update)
+		r.Patch("/{id}", userController.UpdateUser)
 	})
 
 }

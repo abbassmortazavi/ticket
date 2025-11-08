@@ -10,4 +10,5 @@ type UserServiceInterface interface {
 	GetById(ctx context.Context, id int) (models.User, error)
 	GetByUsername(ctx context.Context, username string) (models.User, error)
 	Delete(ctx context.Context, id int) error
+	Update(ctx context.Context, user models.User) error
 }
