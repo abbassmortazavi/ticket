@@ -1,18 +1,29 @@
-package api
+package middlewares
 
 import (
 	"context"
 	"log"
 	"net/http"
 	"strings"
-	"ticket/internal/auth"
+	"ticket/internal/modules/auth/services"
+	auth2 "ticket/pkg/auth"
 )
+
+type Middleware struct {
+	authenticator services.AuthServiceInterface
+}
+
+func NewAuthMiddleware(authenticator services.AuthServiceInterface) *Middleware {
+	return &Middleware{
+		authenticator: authenticator,
+	}
+}
 
 type contextKey string
 
 const UserContextKey = contextKey("user")
 
-func (app *Application) AuthMiddleware(next http.Handler) http.Handler {
+func (m *Middleware) AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
@@ -31,7 +42,7 @@ func (app *Application) AuthMiddleware(next http.Handler) http.Handler {
 		tokenString := parts[1]
 		log.Printf("Extracted token: %s", tokenString) // For debugging
 
-		claims, err := app.Authenticator.ValidateToken(tokenString)
+		claims, err := m.authenticator.ValidateToken(tokenString)
 		if err != nil {
 			log.Println("Invalid token")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
@@ -41,7 +52,8 @@ func (app *Application) AuthMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
-func (app *Application) GetUserFromContext(ctx context.Context) *auth.Claims {
-	user, _ := ctx.Value(UserContextKey).(*auth.Claims)
+
+func (m *Middleware) GetUserFromContext(ctx context.Context) *auth2.Claims {
+	user, _ := ctx.Value(UserContextKey).(*auth2.Claims)
 	return user
 }

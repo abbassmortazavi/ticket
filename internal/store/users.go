@@ -3,7 +3,7 @@ package store
 import (
 	"context"
 	"database/sql"
-	"ticket/internal/models"
+	"ticket/internal/modules/user/models"
 )
 
 type UserStore struct {
