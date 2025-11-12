@@ -2,27 +2,30 @@ package rabbitmq
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"sync"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/spf13/viper"
 )
 
 var (
-	once            sync.Once
-	initErr         error
-	queues          map[string]amqp.Queue
-	rabbitmqConn    *amqp.Connection
-	rabbitmqChannel *amqp.Channel
+	once    sync.Once
+	initErr error
+	queues  map[string]amqp.Queue
 )
 
 func Init() error {
 	once.Do(func() {
 		// Initialize queues map FIRST
 		queues = make(map[string]amqp.Queue)
-
-		conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+		port := viper.GetString("RABBITMQ_PORT")
+		user := viper.GetString("RABBITMQ_USER")
+		pass := viper.GetString("RABBITMQ_PASS")
+		host := viper.GetString("RABBITMQ_HOST")
+		conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s/", user, pass, host, port))
 		if err != nil {
 			initErr = err
 			return
@@ -41,24 +44,8 @@ func Init() error {
 	})
 	return initErr
 }
-
-// Add connection getters for safety
-func GetChannel() *amqp.Channel {
-	if rabbitmqChannel == nil {
-		log.Fatal("RabbitMQ channel not initialized. Call Init() first.")
-	}
-	return rabbitmqChannel
-}
-
-func GetConnection() *amqp.Connection {
-	if rabbitmqConn == nil {
-		log.Fatal("RabbitMQ connection not initialized. Call Init() first.")
-	}
-	return rabbitmqConn
-}
-
 func DeclareQueue(queueName string) amqp.Queue {
-	ch := GetChannel()
+	ch := GetRabbitmqChannel()
 	q, err := ch.QueueDeclare(
 		queueName, // name
 		false,     // durable
@@ -81,7 +68,7 @@ func DeclareQueue(queueName string) amqp.Queue {
 }
 
 func Consume(q *amqp.Queue) {
-	ch := GetChannel()
+	ch := GetRabbitmqChannel()
 	msgs, err := ch.Consume(
 		q.Name, // queue
 		"",     // consumer
@@ -110,7 +97,7 @@ func Consume(q *amqp.Queue) {
 func Publish(q *amqp.Queue, body string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	ch := GetChannel()
+	ch := GetRabbitmqChannel()
 
 	err := ch.PublishWithContext(ctx,
 		"",     // exchange

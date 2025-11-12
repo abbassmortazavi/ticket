@@ -11,6 +11,7 @@ func Send() {
 		log.Fatal("Failed to initialize RabbitMQ:", err)
 	}
 
+	log.Println("Send")
 	// Now you can use other functions
 	rabbitmq.SendMessageToQueue("new_queue", "jafar.com")
 }

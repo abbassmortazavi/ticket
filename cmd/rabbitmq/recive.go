@@ -10,7 +10,7 @@ func Receive() {
 	if err := rabbitmq.Init(); err != nil {
 		log.Fatal("Failed to initialize RabbitMQ:", err)
 	}
-	log.Printf("hereeeeeeeeeeeeeeeeee")
+
 	// Now you can use other functions
 	rabbitmq.ConsumeQueue("new_queue")
 }

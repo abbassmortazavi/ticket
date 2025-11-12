@@ -6,8 +6,8 @@ import (
 
 func main() {
 
-	cmd.Execute()
 	//rabbitmq.Send()
 	//rabbitmq.Receive()
+	cmd.Execute()
 
 }

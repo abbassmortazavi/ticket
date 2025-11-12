@@ -16,11 +16,11 @@ import (
 
 func Serve() {
 
+	config.Set()
 	// Initialize RabbitMQ with error handling
 	if err := rabbitmq.Init(); err != nil {
 		log.Fatalf("Failed to initialize RabbitMQ: %v", err)
 	}
-	config.Set()
 	database.Connect()
 	//authentication
 	jwtAuth := auth.NewJwtAuthenticator(viper.GetString("JWT_SECRET"))

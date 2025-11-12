@@ -1,4 +1,8 @@
 package rabbitmq
 
-//var rabbitmqConn *amqp.Connection
-//var rabbitmqChannel *amqp.Channel
+import amqp "github.com/rabbitmq/amqp091-go"
+
+// var rabbitmqConn *amqp.Connection
+// var rabbitmqChannel *amqp.Channel
+var rabbitmqConn *amqp.Connection
+var rabbitmqChannel *amqp.Channel
