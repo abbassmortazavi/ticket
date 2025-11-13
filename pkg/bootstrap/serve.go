@@ -5,11 +5,10 @@ import (
 	"ticket/pkg/auth"
 	"ticket/pkg/config"
 	"ticket/pkg/database"
+	"ticket/pkg/helpers"
 	"ticket/pkg/logger"
 	"ticket/pkg/middlewares"
 	"ticket/pkg/routing"
-
-	"github.com/spf13/viper"
 )
 
 func Serve() {
@@ -21,7 +20,7 @@ func Serve() {
 	}*/
 	database.Connect()
 	//authentication
-	jwtAuth := auth.NewJwtAuthenticator(viper.GetString("JWT_SECRET"))
+	jwtAuth := auth.NewJwtAuthenticator(helpers.GenerateRandomKey())
 	authService := services.New(jwtAuth)
 	middlewares.Init(authService)
 
