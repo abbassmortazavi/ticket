@@ -25,8 +25,9 @@ func New() *Controller {
 }
 
 type AuthResponse struct {
-	Token string      `json:"token"`
-	User  models.User `json:"user"`
+	Token        string      `json:"token"`
+	RefreshToken string      `json:"refresh_token"`
+	User         models.User `json:"user"`
 }
 
 func (controller *Controller) Login(w http.ResponseWriter, r *http.Request) {
@@ -51,14 +52,12 @@ func (controller *Controller) Login(w http.ResponseWriter, r *http.Request) {
 		utils.InternalError(w, nil, "password error")
 		return
 	}
-	token, err := controller.authService.GenerateToken(user.ID, user.Username)
-	if err != nil {
-		utils.InternalError(w, err)
-		return
-	}
+	accessToken, refreshToken := controller.authService.GenerateToken(user.ID, user.Username)
+
 	res := AuthResponse{
-		Token: token,
-		User:  user,
+		Token:        accessToken,
+		RefreshToken: refreshToken,
+		User:         user,
 	}
 	utils.Success(w, http.StatusOK, res, "User Login")
 }

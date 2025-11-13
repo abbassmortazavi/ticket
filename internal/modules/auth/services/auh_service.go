@@ -14,8 +14,9 @@ func New(jwtAuth *auth.JWT) *AuthService {
 	}
 }
 
-func (a *AuthService) GenerateToken(userID int, username string) (string, error) {
-	return a.jwtAuth.GenerateToken(userID, username)
+func (a *AuthService) GenerateToken(userID int, username string) (string, string) {
+	accessToken, refreshToken := a.jwtAuth.GenerateToken(userID, username)
+	return accessToken, refreshToken
 }
 
 func (a *AuthService) ValidateToken(token string) (*auth.Claims, error) {

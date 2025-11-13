@@ -29,21 +29,38 @@ type JWT struct {
 	SigningKey []byte
 }
 
-func (j *JWT) GenerateToken(userID int, username string) (string, error) {
-
-	//expirationTime := time.Now().Add(24 * time.Hour)
-	expirationTime := time.Now().Add(20 * time.Minute) // Shorter lifetime
+func (j *JWT) GenerateToken(userID int, username string) (string, string) {
+	accessExpiry := time.Now().Add(time.Minute * 2)
+	refreshExpiry := time.Now().Add(time.Minute * 5)
 
 	claims := Claims{
 		UserID:   userID,
 		Username: username,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(expirationTime),
+			ExpiresAt: jwt.NewNumericDate(accessExpiry),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			Issuer:    "auth",
 		},
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(j.SigningKey)
+
+	refreshExpiryClaims := &Claims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(refreshExpiry),
+		},
+	}
+
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signedAccessToken, err := accessToken.SignedString(j.SigningKey)
+	if err != nil {
+		panic(err)
+	}
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshExpiryClaims)
+	signedRefreshToken, err := refreshToken.SignedString(j.SigningKey)
+	if err != nil {
+		panic(err)
+	}
+
+	return signedAccessToken, signedRefreshToken
 }
 
 func (j *JWT) ValidateToken(token string) (*Claims, error) {
