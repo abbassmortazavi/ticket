@@ -12,4 +12,8 @@ type Config struct {
 	MaxIdleTimeout string `mapstructure:"DB_MAX_IDLE_TIMEOUT"`
 	AppPort        string `mapstructure:"APP_PORT"`
 	JwtSecret      string `mapstructure:"JWT_SECRET"`
+	RabbitMqHost   string `mapstructure:"RABBITMQ_HOST"`
+	RabbitMqPort   int    `mapstructure:"RABBITMQ_PORT"`
+	RabbitMqUser   string `mapstructure:"RABBITMQ_USER"`
+	RabbitMqPass   string `mapstructure:"RABBITMQ_PASS"`
 }

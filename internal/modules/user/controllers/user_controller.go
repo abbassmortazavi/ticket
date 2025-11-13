@@ -68,6 +68,8 @@ func (c *UserController) GetUser(w http.ResponseWriter, r *http.Request) {
 		FullName: user.FullName,
 		Mobile:   user.Mobile,
 	}
+	//rabbitmq.SendMessageToQueue("jafar_queue", "hi every body")
+	//rabbitmq.ConsumeQueue("jafar_queue")
 	utils.Success(w, http.StatusOK, res, "Fetch User Successfully")
 }
 func (c *UserController) DeleteUser(w http.ResponseWriter, r *http.Request) {
