@@ -1,7 +1,8 @@
 package bootstrap
 
 import (
-	"ticket/internal/modules/auth/services"
+	"ticket/internal/modules/auth/repositories"
+	auth2 "ticket/internal/modules/auth/services"
 	"ticket/pkg/auth"
 	"ticket/pkg/config"
 	"ticket/pkg/database"
@@ -20,8 +21,10 @@ func Serve() {
 	}*/
 	database.Connect()
 	//authentication
-	jwtAuth := auth.NewJwtAuthenticator(helpers.GenerateRandomKey())
-	authService := services.New(jwtAuth)
+	jwtAuth := auth.NewJwtAuthenticator(helpers.GenerateRandomKey(), repositories.UserTokenRepository{
+		DB: database.DB,
+	})
+	authService := auth2.New(jwtAuth)
 	middlewares.Init(authService)
 
 	logger.Init()

@@ -24,6 +24,7 @@ type contextKey string
 const UserContextKey = contextKey("user")
 
 func (m *Middleware) AuthMiddleware(next http.Handler) http.Handler {
+	log.Println('A', "Middleware AuthMiddleware")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
@@ -40,11 +41,10 @@ func (m *Middleware) AuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		tokenString := parts[1]
-		log.Printf("Extracted token: %s", tokenString) // For debugging
 
 		claims, err := m.authenticator.ValidateToken(tokenString)
 		if err != nil {
-			log.Println("Invalid token")
+			log.Println(err.Error())
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
