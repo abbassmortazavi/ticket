@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
 	"ticket/internal/modules/auth/requests"
 	"ticket/internal/modules/auth/services"
@@ -25,9 +26,8 @@ func New() *Controller {
 }
 
 type AuthResponse struct {
-	Token        string      `json:"token"`
-	RefreshToken string      `json:"refresh_token"`
-	User         models.User `json:"user"`
+	Tokens *auth.TokenResponse `json:"tokens"`
+	User   models.User         `json:"user"`
 }
 
 func (controller *Controller) Login(w http.ResponseWriter, r *http.Request) {
@@ -52,12 +52,11 @@ func (controller *Controller) Login(w http.ResponseWriter, r *http.Request) {
 		utils.InternalError(w, nil, "password error")
 		return
 	}
-	accessToken, refreshToken := controller.authService.GenerateToken(user.ID, user.Username)
+	tokens := controller.authService.GenerateToken(user.ID, user.Username)
 
 	res := AuthResponse{
-		Token:        accessToken,
-		RefreshToken: refreshToken,
-		User:         user,
+		Tokens: tokens,
+		User:   user,
 	}
 	utils.Success(w, http.StatusOK, res, "User Login")
 }
@@ -85,4 +84,26 @@ func (controller *Controller) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	utils.Created(w, res)
+}
+func (controller *Controller) RefreshToken(w http.ResponseWriter, r *http.Request) {
+	var request struct {
+		RefreshToken string `json:"refresh_token"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+
+	// Refresh access token
+	tokens, err := controller.authService.RefreshToken(request.RefreshToken)
+	if err != nil {
+		http.Error(w, "Invalid refresh token", http.StatusUnauthorized)
+		return
+	}
+
+	res := AuthResponse{
+		Tokens: tokens,
+	}
+	utils.Success(w, http.StatusOK, res, "Refresh Token Success")
 }
