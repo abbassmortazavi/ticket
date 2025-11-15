@@ -119,10 +119,19 @@ func (r *Room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		Name:    generateUserName(),
 	}
 
+	// Send user_info to THIS client only
+	client.Socket.WriteJSON(struct {
+		Type     string `json:"type"`
+		Username string `json:"username"`
+	}{
+		Type:     "user_info",
+		Username: client.Name,
+	})
+
 	// Register client
 	r.Join <- client
 
-	// Send initial user list to this client only
+	// Send initial user list to this client
 	r.sendUserList(client)
 
 	// Start goroutines

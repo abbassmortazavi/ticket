@@ -10,7 +10,6 @@ import (
 // read reads messages from the WebSocket connection
 func (c *Client) read() {
 	defer func() {
-		// Safely remove client from room
 		if c.Room != nil {
 			c.Room.Leave <- c
 		}
@@ -18,7 +17,7 @@ func (c *Client) read() {
 	}()
 
 	for {
-		_, message, err := c.Socket.ReadMessage()
+		_, rawMsg, err := c.Socket.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("WebSocket read error: %v", err)
@@ -26,9 +25,21 @@ func (c *Client) read() {
 			break
 		}
 
+		// پیام خام کلاینت را پارس می‌کنیم
+		var incoming struct {
+			Type    string `json:"type"`
+			Message string `json:"message"`
+		}
+
+		if err := json.Unmarshal(rawMsg, &incoming); err != nil {
+			log.Println("Invalid incoming JSON:", err)
+			continue
+		}
+
+		// ساختن پیام نهایی برای همه
 		msg := Message{
 			Name:    c.Name,
-			Message: string(message),
+			Message: incoming.Message, // فقط متن پیام
 			Room:    c.Room.Name,
 			Type:    "message",
 		}
@@ -39,7 +50,6 @@ func (c *Client) read() {
 			continue
 		}
 
-		// Check if room is still active before sending
 		if c.Room != nil {
 			c.Room.Forward <- jsonMsg
 		}
