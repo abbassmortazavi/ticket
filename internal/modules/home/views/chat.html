@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Chat Room</title>
+    <link rel="stylesheet" href="/assets/css/style.css" />
+</head>
+<body class="chat-body">
+<header>
+    <div class="header-content">
+        <h1>Chat Room</h1>
+        <div id="status" class="status-indicator"></div>
+    </div>
+</header>
+
+<div class="chat-container">
+    <!-- Online Users Sidebar -->
+    <div class="users-sidebar">
+        <div class="users-header">
+            <h3>Online Users</h3>
+            <span id="userCount" class="user-count">0</span>
+        </div>
+        <div id="usersList" class="users-list">
+            <!-- Users will be dynamically added here -->
+        </div>
+    </div>
+
+    <!-- Main Chat Area -->
+    <div class="chat-main">
+        <div id="messages" class="messages-container"></div>
+
+        <div class="chat-input">
+            <input id="msg" type="text" placeholder="Type a message..." />
+            <button id="sendBtn">Send</button>
+        </div>
+    </div>
+</div>
+
+<script src="/assets/js/chat.js"></script>
+</body>
+</html>

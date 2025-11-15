@@ -9,5 +9,4 @@ func main() {
 	//rabbitmq.Send()
 	//rabbitmq.Receive()
 	cmd.Execute()
-
 }
