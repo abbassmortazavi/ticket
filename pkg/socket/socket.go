@@ -1,20 +1,34 @@
 package socket
 
+import "log"
+
 // Package socket provides WebSocket functionality for real-time communication
 // It includes room management, client handling, and message broadcasting
 
 // GetOrCreateRoom gets an existing room or creates a new one
 // This maintains backward compatibility with your existing code
 
+// GetOrCreateRoom gets an existing room or creates a new one
 func GetOrCreateRoom(name string) *Room {
 	roomsLock.Lock()
 	defer roomsLock.Unlock()
+
 	if room, exists := rooms[name]; exists {
+		log.Printf("Returning existing room: %s", name)
 		return room
 	}
+
 	room := NewRoom(name)
 	rooms[name] = room
-	go room.Run()
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Printf("Room %s panicked: %v", name, r)
+			}
+		}()
+		room.Run()
+	}()
+	log.Printf("Created new room: %s", name)
 	return room
 }
 
@@ -22,9 +36,11 @@ func GetOrCreateRoom(name string) *Room {
 func RemoveRoom(name string) {
 	roomsLock.Lock()
 	defer roomsLock.Unlock()
+
 	if room, exists := rooms[name]; exists {
 		room.Close()
 		delete(rooms, name)
+		log.Printf("Removed room: %s", name)
 	}
 }
 

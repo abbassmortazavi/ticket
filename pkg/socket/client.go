@@ -9,15 +9,23 @@ import (
 
 // read reads messages from the WebSocket connection
 func (c *Client) read() {
-	defer c.Socket.Close()
+	defer func() {
+		// Safely remove client from room
+		if c.Room != nil {
+			c.Room.Leave <- c
+		}
+		c.Socket.Close()
+	}()
+
 	for {
 		_, message, err := c.Socket.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
-				return
+				log.Printf("WebSocket read error: %v", err)
 			}
+			break
 		}
+
 		msg := Message{
 			Name:    c.Name,
 			Message: string(message),
@@ -27,21 +35,36 @@ func (c *Client) read() {
 
 		jsonMsg, err := json.Marshal(msg)
 		if err != nil {
-			log.Printf("error: %v", err)
+			log.Printf("JSON marshal error: %v", err)
 			continue
 		}
-		c.Room.Forward <- jsonMsg
+
+		// Check if room is still active before sending
+		if c.Room != nil {
+			c.Room.Forward <- jsonMsg
+		}
 	}
 }
 
 // write writes messages to the WebSocket connection
 func (c *Client) write() {
 	defer c.Socket.Close()
-	for msg := range c.Receive {
-		err := c.Socket.WriteMessage(websocket.TextMessage, msg)
-		if err != nil {
-			log.Printf("error: %v", err)
-			return
+	for {
+		select {
+		case msg, ok := <-c.Receive:
+			if !ok {
+				// Channel closed, send close message
+				err := c.Socket.WriteMessage(websocket.CloseMessage, []byte{})
+				if err != nil {
+					return
+				}
+				return
+			}
+			err := c.Socket.WriteMessage(websocket.TextMessage, msg)
+			if err != nil {
+				log.Printf("WebSocket write error: %v", err)
+				return
+			}
 		}
 	}
 }
