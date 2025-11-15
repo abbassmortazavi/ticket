@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"sync"
-	"ticket/cmd/socket"
+	"ticket/pkg/socket"
 )
 
 type TemplateHandler struct {
@@ -29,7 +29,6 @@ func main() {
 	//rabbitmq.Receive()
 	var addr = flag.String("addr", "localhost:8083", "http service address")
 	flag.Parse()
-	r := socket.NewRoom()
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
@@ -39,17 +38,17 @@ func main() {
 	http.Handle("/chat", &TemplateHandler{
 		filename: "chat.html",
 	})
+	// WebSocket endpoint - using the global function for backward compatibility
 	http.HandleFunc("/room", func(w http.ResponseWriter, r *http.Request) {
 		roomName := r.URL.Query().Get("room")
 		if roomName == "" {
-			//roomName = "default"
-			http.Error(w, "Room name is not be empty", http.StatusBadRequest)
+			http.Error(w, "Room name is required", http.StatusBadRequest)
 			return
 		}
-		realRoom := socket.GetRoom(roomName)
-		realRoom.ServeHTTP(w, r)
+
+		room := socket.GetOrCreateRoom(roomName)
+		room.ServeHTTP(w, r)
 	})
-	go r.Run()
 
 	log.Printf("listening on %s", *addr)
 
