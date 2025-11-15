@@ -2,11 +2,12 @@ package socket
 
 import (
 	"fmt"
-	"github.com/gorilla/websocket"
 	"log"
 	"math/rand"
 	"net/http"
 	"sync"
+
+	"github.com/gorilla/websocket"
 )
 
 type Room struct {
