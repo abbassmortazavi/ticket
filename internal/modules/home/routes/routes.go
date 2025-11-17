@@ -8,6 +8,6 @@ import (
 
 func Routes(router chi.Router) {
 	homeController := homeCtrl.New()
-	router.Get("/", homeController.Home)
+	router.Get("/join", homeController.Home)
 	router.Get("/chat", homeController.Chat)
 }

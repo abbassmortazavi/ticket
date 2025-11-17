@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Register</title>
+    <link rel="stylesheet" href="/assets/css/login-style.css" />
+</head>
+<body>
+<div class="container">
+    <!-- Login Form -->
+    <div class="form-container" id="loginForm">
+        <div class="form-header">
+            <h2>Welcome Back</h2>
+            <p>Please sign in to your account</p>
+        </div>
+        <form class="form">
+            <div class="input-group">
+                <input type="text" id="loginUsername" required>
+                <label for="loginUsername">Username</label>
+            </div>
+            <div class="input-group">
+                <input type="password" id="loginPassword" required>
+                <label for="loginPassword">Password</label>
+            </div>
+            <button type="submit" class="btn">Sign In</button>
+        </form>
+        <div class="form-footer">
+            <p>Don't have an account? <a href="#" onclick="showRegister()">Sign up</a></p>
+        </div>
+    </div>
+
+    <!-- Register Form -->
+    <div class="form-container" id="registerForm" style="display: none;">
+        <div class="form-header">
+            <h2>Create Account</h2>
+            <p>Join us today</p>
+        </div>
+        <form class="form">
+            <div class="input-group">
+                <input type="text" id="registerName" name="username" required>
+                <label for="registerName">Full Name</label>
+            </div>
+            <div class="input-group">
+                <input type="text" id="registerUsername" required>
+                <label for="registerUsername">Username</label>
+            </div>
+            <div class="input-group">
+                <input type="email" id="registerEmail" required>
+                <label for="registerEmail">Email</label>
+            </div>
+            <div class="input-group">
+                <input type="password" id="registerPassword" required>
+                <label for="registerPassword">Password</label>
+            </div>
+            <div class="input-group">
+                <input type="password" id="confirmPassword" required>
+                <label for="confirmPassword">Confirm Password</label>
+            </div>
+            <button type="submit" class="btn">Create Account</button>
+        </form>
+        <div class="form-footer">
+            <p>Already have an account? <a href="#" onclick="showLogin()">Sign in</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showRegister() {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'block';
+    }
+
+    function showLogin() {
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('loginForm').style.display = 'block';
+    }
+
+    // Form submission handlers
+    document.querySelectorAll('.form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetch('/handel-login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: document.getElementById('loginUsername').value,
+                    password: document.getElementById('loginPassword').value
+                })
+            }).then(res => {
+                if (res.status === 200) {
+                    console.log(res.json())
+                    window.location.href="/join";
+                }
+            })
+        });
+    });
+</script>
+</body>
+</html>

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"ticket/internal/modules/auth/requests"
 	"ticket/internal/modules/auth/services"
@@ -9,6 +10,8 @@ import (
 	userService "ticket/internal/modules/user/services"
 	"ticket/internal/utils"
 	"ticket/pkg/auth"
+	"ticket/pkg/html"
+	"ticket/pkg/session"
 
 	log2 "github.com/rs/zerolog/log"
 )
@@ -106,4 +109,48 @@ func (controller *Controller) RefreshToken(w http.ResponseWriter, r *http.Reques
 		Tokens: tokens,
 	}
 	utils.Success(w, http.StatusOK, res, "Refresh Token Success")
+}
+
+// Web page
+func (controller *Controller) LoginForm(w http.ResponseWriter, r *http.Request) {
+	data := map[string]interface{}{
+		"title": "Home Page",
+	}
+	html.Render(w, "login", data)
+}
+func (controller *Controller) LoginHandler(w http.ResponseWriter, r *http.Request) {
+	var req requests.LoginRequest
+	err := utils.ReadJson(w, r, &req)
+	if err != nil {
+		log.Println(1)
+		log2.Err(err).Msg("error decoding body")
+		return
+	}
+	log.Println(2)
+	if !utils.ValidateStruct(w, &req) {
+		return
+	}
+	ctx := r.Context()
+	user, err := controller.userService.GetByUsername(ctx, req.Username)
+	if err != nil {
+		utils.InternalError(w, err)
+		return
+	}
+	if err := user.CheckPassword(req.Password); err == false {
+		utils.InternalError(w, nil, "password error")
+		return
+	}
+
+	err = session.Set(w, r, "user_id", user.ID)
+	if err != nil {
+		log2.Err(err).Msg("error setting session")
+		return
+	}
+
+	err = session.Set(w, r, "name", user.FullName)
+	if err != nil {
+		log2.Err(err).Msg("error setting session")
+		return
+	}
+	http.Redirect(w, r, "/join", http.StatusFound)
 }

@@ -7,6 +7,7 @@
 </head>
 <body class="index-body">
 <h1>Join a Chat Room</h1>
+<h2>Select a Chat Room  {{ .userID }}-{{ .name }}</h2>
 <form action="/chat" method="get">
     <input type="text" name="room" placeholder="Enter channel name..." required />
     <button type="submit">Join</button>
