@@ -17,3 +17,12 @@ func GenerateRandomKey() string {
 	}
 	return base64.URLEncoding.EncodeToString(key)
 }
+
+func GenerateRandomKeySession(num int) []byte {
+	key := make([]byte, num)
+	_, err := rand.Read(key)
+	if err != nil {
+		log.Fatalf("Failed to generate random key: %v", err)
+	}
+	return key
+}

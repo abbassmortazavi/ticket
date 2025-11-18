@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"net/http"
 	"sync"
+	"ticket/pkg/session"
 
 	"github.com/gorilla/websocket"
 	"github.com/spf13/viper"
@@ -112,11 +113,19 @@ func (r *Room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	name, err := session.Get(req, "name")
+	if err != nil {
+		log.Println("session error:", err)
+	}
+	if name == "" {
+		name = generateUserName()
+	}
+
 	client := &Client{
 		Socket:  conn,
 		Receive: make(chan []byte, 256),
 		Room:    r,
-		Name:    generateUserName(),
+		Name:    name.(string),
 	}
 
 	// Send user_info to THIS client only

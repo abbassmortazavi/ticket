@@ -13,5 +13,6 @@ func Routes(router chi.Router) {
 		r.Post("/register", authController.Register)
 		r.Post("/refresh-token", authController.RefreshToken)
 	})
-
+	router.Get("/", authController.LoginForm)
+	router.Post("/handel-login", authController.LoginHandler)
 }

@@ -11,6 +11,7 @@ import (
 	"ticket/pkg/logger"
 	"ticket/pkg/middlewares"
 	"ticket/pkg/routing"
+	"ticket/pkg/session"
 	"ticket/pkg/static"
 )
 
@@ -33,6 +34,7 @@ func Serve() {
 	routing.Init()
 	html.LoadHtml(routing.GetRouter())
 	routing.RegisterRoutes()
+	session.Init(helpers.GenerateRandomKeySession(64), helpers.GenerateRandomKeySession(32), "my_session")
 	static.LoadAsset(routing.GetRouter())
 	routing.Run()
 }
