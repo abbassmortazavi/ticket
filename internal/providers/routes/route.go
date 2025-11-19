@@ -4,6 +4,7 @@ import (
 	"net/http"
 	auth "ticket/internal/modules/auth/routes"
 	home "ticket/internal/modules/home/routes"
+	message "ticket/internal/modules/message/routes"
 	ticket "ticket/internal/modules/ticket/routes"
 	user "ticket/internal/modules/user/routes"
 	"ticket/pkg/socket"
@@ -16,6 +17,7 @@ func RegisterRoutes(router chi.Router) {
 	user.Routes(router)
 	auth.Routes(router)
 	home.Routes(router)
+	message.Routes(router)
 	// Register WebSocket route directly
 	router.HandleFunc("/room", func(w http.ResponseWriter, r *http.Request) {
 		roomName := r.URL.Query().Get("room")

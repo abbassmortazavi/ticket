@@ -28,13 +28,10 @@ func Init(authKey, encryptionKey []byte, appName string) {
 
 // Set sets a session value
 func Set(w http.ResponseWriter, r *http.Request, key string, value interface{}) error {
-	log.Println("inja Set session")
 	session, err := Store.Get(r, sessionName)
-	log.Println("err=======>", err)
 	if err != nil {
 		return err
 	}
-	log.Println("Set", key, value)
 	session.Values[key] = value
 	return session.Save(r, w)
 }
