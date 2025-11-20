@@ -15,4 +15,5 @@ func Routes(router chi.Router) {
 	})
 	router.Get("/", authController.LoginForm)
 	router.Post("/handel-login", authController.LoginHandler)
+	router.Get("/user-info", authController.GetUserInfo)
 }

@@ -10,4 +10,5 @@ func Routes(router chi.Router) {
 	homeController := homeCtrl.New()
 	router.Get("/join", homeController.Home)
 	router.Get("/chat", homeController.Chat)
+	router.Post("/save-message", homeController.SaveMessage)
 }

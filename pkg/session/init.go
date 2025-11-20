@@ -28,13 +28,10 @@ func Init(authKey, encryptionKey []byte, appName string) {
 
 // Set sets a session value
 func Set(w http.ResponseWriter, r *http.Request, key string, value interface{}) error {
-	log.Println("inja Set session")
 	session, err := Store.Get(r, sessionName)
-	log.Println("err=======>", err)
 	if err != nil {
 		return err
 	}
-	log.Println("Set", key, value)
 	session.Values[key] = value
 	return session.Save(r, w)
 }
@@ -102,4 +99,19 @@ func Exists(r *http.Request, key string) bool {
 
 	_, exists := session.Values[key]
 	return exists
+}
+
+// DeleteAll deletes all session values for the current user
+func DeleteAll(w http.ResponseWriter, r *http.Request) error {
+	session, err := Store.Get(r, sessionName)
+	if err != nil {
+		log.Println("DeleteAll:", err)
+		return err
+	}
+	log.Println("sessions : ", session.Values)
+
+	// Clear all values but keep the session
+	session.Values = make(map[interface{}]interface{})
+
+	return session.Save(r, w)
 }

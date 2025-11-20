@@ -41,6 +41,7 @@ func (controller *Controller) Login(w http.ResponseWriter, r *http.Request) {
 		utils.BadRequest(w, "error decoding body", err)
 		return
 	}
+
 	if !utils.ValidateStruct(w, &req) {
 		return
 	}
@@ -61,6 +62,7 @@ func (controller *Controller) Login(w http.ResponseWriter, r *http.Request) {
 		Tokens: tokens,
 		User:   user,
 	}
+
 	utils.Success(w, http.StatusOK, res, "User Login")
 }
 
@@ -153,4 +155,33 @@ func (controller *Controller) LoginHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	http.Redirect(w, r, "/join", http.StatusFound)
+}
+
+func (c *Controller) GetUserInfo(w http.ResponseWriter, r *http.Request) {
+	userID, err := session.Get(r, "user_id")
+	if err != nil {
+		err = utils.WriteJsonError(w, http.StatusUnauthorized, "Please log in")
+		if err != nil {
+			return
+		}
+		return
+	}
+
+	userName, err := session.Get(r, "name")
+	if err != nil {
+		err = utils.WriteJsonError(w, http.StatusInternalServerError, "Session error")
+		if err != nil {
+			return
+		}
+		return
+	}
+
+	err = utils.WriteJson(w, http.StatusOK, map[string]interface{}{
+		"success":  true,
+		"user_id":  userID,
+		"username": userName,
+	})
+	if err != nil {
+		return
+	}
 }
