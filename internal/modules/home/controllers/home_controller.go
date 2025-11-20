@@ -93,10 +93,9 @@ func (c *Controller) SaveMessage(w http.ResponseWriter, r *http.Request) {
 		MessageType: "text",
 	}
 
-	res, err := c.messageRepository.SaveMessage(ctx, &messageSave)
+	_, err = c.messageRepository.SaveMessage(ctx, &messageSave)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	log.Println(res)
 }
