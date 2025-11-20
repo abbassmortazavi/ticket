@@ -100,3 +100,18 @@ func Exists(r *http.Request, key string) bool {
 	_, exists := session.Values[key]
 	return exists
 }
+
+// DeleteAll deletes all session values for the current user
+func DeleteAll(w http.ResponseWriter, r *http.Request) error {
+	session, err := Store.Get(r, sessionName)
+	if err != nil {
+		log.Println("DeleteAll:", err)
+		return err
+	}
+	log.Println("sessions : ", session.Values)
+
+	// Clear all values but keep the session
+	session.Values = make(map[interface{}]interface{})
+
+	return session.Save(r, w)
+}

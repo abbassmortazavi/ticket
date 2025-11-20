@@ -97,3 +97,22 @@ func ReadJson(w http.ResponseWriter, r *http.Request, data any) error {
 	decoder.DisallowUnknownFields()
 	return decoder.Decode(data)
 }
+
+func WriteJson(w http.ResponseWriter, status int, data any) error {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(status)
+	return json.NewEncoder(w).Encode(data)
+}
+
+func WriteJsonError(w http.ResponseWriter, status int, message string) error {
+	type envelop struct {
+		Error string `json:"error"`
+	}
+	return writeJson(w, status, &envelop{Error: message})
+}
+
+func writeJson(w http.ResponseWriter, status int, data any) error {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(status)
+	return json.NewEncoder(w).Encode(data)
+}
